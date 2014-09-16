@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DorTaxRateReader", "DorTaxRateReader\DorTaxRateReader.csproj", "{B6ECCE2F-9138-4669-B5C2-906C499649DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DorTaxDataContracts", "DorTaxDataContracts\DorTaxDataContracts.csproj", "{9F71BA15-A1C9-4953-95E6-AB1A0D77565F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6ECCE2F-9138-4669-B5C2-906C499649DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6ECCE2F-9138-4669-B5C2-906C499649DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6ECCE2F-9138-4669-B5C2-906C499649DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6ECCE2F-9138-4669-B5C2-906C499649DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F71BA15-A1C9-4953-95E6-AB1A0D77565F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F71BA15-A1C9-4953-95E6-AB1A0D77565F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F71BA15-A1C9-4953-95E6-AB1A0D77565F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F71BA15-A1C9-4953-95E6-AB1A0D77565F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

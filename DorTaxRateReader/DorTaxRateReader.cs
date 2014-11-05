@@ -1,57 +1,42 @@
-﻿using System;
+﻿using NetTopologySuite.IO;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using NetTopologySuite.IO;
+using Wsdot.Dor.Tax.DataContracts;
 using TaxRateDict = System.Collections.Generic.Dictionary<string, Wsdot.Dor.Tax.DataContracts.TaxRateItem>;
-using System.Linq;
 
 namespace Wsdot.Dor.Tax
 {
-	using Wsdot.Dor.Tax.DataContracts;
-	using QuarterDict = Dictionary<int, TaxRateDict>;
-	using NetTopologySuite.Geometries;
-	using System.Diagnostics;
 	using GeoAPI.Geometries;
+	using NetTopologySuite.Geometries;
+	using QuarterDict = Dictionary<QuarterYear, TaxRateDict>;
 
 	public class DorTaxRateReader
 	{
-		const string _url_pattern = "http://dor.wa.gov/downloads/Add_Data/Rates{0}Q{1}.zip";
+		const string _urlPattern = "http://dor.wa.gov/downloads/Add_Data/Rates{0}Q{1}.zip";
 		// LOCCODE_PUBLIC_14Q4.zip
-		const string _loc_code_boundaries_shp_url_pattern = "http://dor.wa.gov/downloads/LocBounds/LOCCODE_PUBLIC_{0:yy}Q{1}.zip";
+		const string _locCodeBoundariesShpUrlPattern = "http://dor.wa.gov/downloads/LocBounds/LOCCODE_PUBLIC_{0:yy}Q{1}.zip";
 		const string _csv_pattern = "Rates{0}Q{1}.csv";
 		const string _date_format = "yyyyMMdd";
 
-		static Dictionary<int, QuarterDict> _storedRates = new Dictionary<int, QuarterDict>();
+		static QuarterDict _storedRates = new QuarterDict();
 
-		/////// <summary>
-		/////// Gets the quarter for the given date.
-		/////// </summary>
-		/////// <param name="date"></param>
-		/////// <returns>Returns the quarter that the given month falls into (1-4).</returns>
-		////public static int GetQuarter(DateTime date)
-		////{
-		////	double mDiv3 = date.Month / 3;
-		////	return Convert.ToInt32(Math.Ceiling(mDiv3));
-		////}
-
-		public static Dictionary<string, byte[]> GetTaxBoundaries(DateTime date = default(DateTime))
+		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(DateTime date = default(DateTime))
 		{
 			if (date == default(DateTime))
 			{
 				date = DateTime.Today;
 			}
 			int quarter = QuarterYear.GetQuarter(date);
-			var uri = new Uri(string.Format(_loc_code_boundaries_shp_url_pattern, date, quarter));
+			var uri = new Uri(string.Format(_locCodeBoundariesShpUrlPattern, date, quarter));
 			// Get the path to the TEMP directory.
 			string tempDirPath = Path.GetTempPath();
 			string dir = Path.Combine(tempDirPath, Path.GetRandomFileName());
 			DirectoryInfo dirInfo = Directory.CreateDirectory(dir);
 			string shp_name = null;
-
-			var dict = new Dictionary<string, byte[]>();
 
 			try
 			{
@@ -76,16 +61,9 @@ namespace Wsdot.Dor.Tax
 					}
 				}).Wait();
 
-				using (var shapefileReader = new ShapefileDataReader(shp_name, new OgcCompliantGeometryFactory()))
+				foreach (var kvp in EnumerateLocationCodeBoundaries(shp_name))
 				{
-					int locCodeId = shapefileReader.GetOrdinal("LOCCODE");
-
-					while (shapefileReader.Read())
-					{
-						string locCode = shapefileReader.GetString(locCodeId);
-						IGeometry shape = shapefileReader.Geometry;
-						dict.Add(locCode, shape != null ? shape.AsBinary() : null);
-					}
+					yield return kvp;
 				}
 
 			}
@@ -93,6 +71,32 @@ namespace Wsdot.Dor.Tax
 			{
 				dirInfo.Delete(true);
 			}
+		}
+
+		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(string shapePath)
+		{
+			using (var shapefileReader = new ShapefileDataReader(shapePath, new OgcCompliantGeometryFactory()))
+			{
+				int locCodeId = shapefileReader.GetOrdinal("LOCCODE");
+
+				while (shapefileReader.Read())
+				{
+					string locCode = shapefileReader.GetString(locCodeId);
+					var shape = shapefileReader.Geometry;
+					yield return new KeyValuePair<string, IGeometry>(locCode, shape);
+				}
+			}
+		}
+
+		public static Dictionary<string, byte[]> GetTaxBoundaries(DateTime date = default(DateTime))
+		{
+			var dict = new Dictionary<string, byte[]>();
+
+			foreach (var kvp in EnumerateLocationCodeBoundaries(date))
+			{
+				dict.Add(kvp.Key,  kvp.Value != null ? kvp.Value.AsBinary() : null);
+			}
+
 
 			return dict;
 		}
@@ -107,52 +111,66 @@ namespace Wsdot.Dor.Tax
 			if (date == default(DateTime)) {
 				date = DateTime.Today;
 			}
-			int quarter = QuarterYear.GetQuarter(date);
+			var qy = new QuarterYear(date);
 
 			TaxRateDict output = null;
 
-			if (_storedRates.ContainsKey(date.Year) && _storedRates[date.Year].ContainsKey(quarter))
+			if (_storedRates.ContainsKey(qy))
 			{
-				output = _storedRates[date.Year][quarter];
+				output = _storedRates[qy];
 			}
 			else
 			{
 
-				Uri uri = new Uri(string.Format(_url_pattern, date.Year, quarter));
+				Uri uri = new Uri(string.Format(_urlPattern, date.Year, qy.Quarter));
 
 				var client = new HttpClient();
 				client.GetStreamAsync(uri).ContinueWith(responseTask =>
 				{
 					output = new TaxRateDict();
-					using (var zipArchive = new ZipArchive(responseTask.Result, ZipArchiveMode.Read))
+					foreach (var item in EnumerateZippedTaxRateCsv(responseTask.Result))
 					{
-						ZipArchiveEntry csvEntry = zipArchive.GetEntry(string.Format(_csv_pattern, date.Year, quarter));
-						using (var csvStream = csvEntry.Open())
-						using (var streamReader = new StreamReader(csvStream))
-						{
-							// Skip the first CSV line of column headings.
-							string line = streamReader.ReadLine();
-							while (!streamReader.EndOfStream)
-							{
-								line = streamReader.ReadLine();
-								var taxRateItem = ToTaxRateItem(line);
-								output.Add(taxRateItem.LocationCode, taxRateItem);
-							}
-						}
+						output.Add(item.LocationCode, item);
 					}
 				}).Wait();
 
-				// Store the rates for this quarter so they don't need to be retrieved again.
-				if (!_storedRates.ContainsKey(date.Year))
-				{
-					_storedRates.Add(date.Year, new QuarterDict());
-				}
-				_storedRates[date.Year][quarter] = output;
+				// Store the rates for this qy so they don't need to be retrieved again.
+				_storedRates.Add(qy, output);
 			}
 
 
 
 			return output;
+		}
+
+		public static IEnumerable<TaxRateItem> EnumerateZippedTaxRateCsv(Stream zipFile)
+		{
+			using (var zipArchive = new ZipArchive(zipFile, ZipArchiveMode.Read))
+			{
+				ZipArchiveEntry csvEntry = zipArchive.Entries[0];
+				using (var csvStream = csvEntry.Open())
+				{
+					foreach (var item in EnumerateTaxRateCsv(csvStream))
+					{
+						yield return item;
+					}
+				}
+			}
+		}
+
+		public static IEnumerable<TaxRateItem> EnumerateTaxRateCsv(Stream csvFile)
+		{
+			using (var streamReader = new StreamReader(csvFile))
+			{
+				// Skip the first CSV line of column headings.
+				string line = streamReader.ReadLine();
+				while (!streamReader.EndOfStream)
+				{
+					line = streamReader.ReadLine();
+					var taxRateItem = ToTaxRateItem(line);
+					yield return taxRateItem;
+				}
+			}
 		}
 
 		/// <summary>

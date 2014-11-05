@@ -26,16 +26,16 @@ namespace Wsdot.Dor.Tax
 
 		static Dictionary<int, QuarterDict> _storedRates = new Dictionary<int, QuarterDict>();
 
-		/// <summary>
-		/// Gets the quarter for the given date.
-		/// </summary>
-		/// <param name="date"></param>
-		/// <returns>Returns the quarter that the given month falls into (1-4).</returns>
-		public static int GetQuarter(DateTime date)
-		{
-			double mDiv3 = date.Month / 3;
-			return Convert.ToInt32(Math.Ceiling(mDiv3));
-		}
+		/////// <summary>
+		/////// Gets the quarter for the given date.
+		/////// </summary>
+		/////// <param name="date"></param>
+		/////// <returns>Returns the quarter that the given month falls into (1-4).</returns>
+		////public static int GetQuarter(DateTime date)
+		////{
+		////	double mDiv3 = date.Month / 3;
+		////	return Convert.ToInt32(Math.Ceiling(mDiv3));
+		////}
 
 		public static Dictionary<string, byte[]> GetTaxBoundaries(DateTime date = default(DateTime))
 		{
@@ -43,7 +43,7 @@ namespace Wsdot.Dor.Tax
 			{
 				date = DateTime.Today;
 			}
-			int quarter = GetQuarter(date);
+			int quarter = QuarterYear.GetQuarter(date);
 			var uri = new Uri(string.Format(_loc_code_boundaries_shp_url_pattern, date, quarter));
 			// Get the path to the TEMP directory.
 			string tempDirPath = Path.GetTempPath();
@@ -107,7 +107,7 @@ namespace Wsdot.Dor.Tax
 			if (date == default(DateTime)) {
 				date = DateTime.Today;
 			}
-			int quarter = GetQuarter(date);
+			int quarter = QuarterYear.GetQuarter(date);
 
 			TaxRateDict output = null;
 

@@ -31,8 +31,6 @@ namespace UnitTests
 			Assert.IsNotNull(boundaries);
 			CollectionAssert.AllItemsAreNotNull(boundaries);
 
-			////string json = JsonConvert.SerializeObject(boundaries, Formatting.Indented);
-
 			// Create the output JSON filename.
 			string jsonFN = System.IO.Path.Combine(TestContext.DeploymentDirectory, "boundaries.json");
 

@@ -1,20 +1,18 @@
-﻿using System;
+﻿using NetTopologySuite.IO;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using NetTopologySuite.IO;
 using TaxRateDict = System.Collections.Generic.Dictionary<string, Wsdot.Dor.Tax.DataContracts.TaxRateItem>;
-using System.Linq;
 
 namespace Wsdot.Dor.Tax
 {
+	using GeoAPI.Geometries;
+	using NetTopologySuite.Geometries;
 	using Wsdot.Dor.Tax.DataContracts;
 	using QuarterDict = Dictionary<int, TaxRateDict>;
-	using NetTopologySuite.Geometries;
-	using System.Diagnostics;
-	using GeoAPI.Geometries;
 
 	public class DorTaxRateReader
 	{

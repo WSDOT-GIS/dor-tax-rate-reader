@@ -30,6 +30,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GeoAPI, Version=1.7.3.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\GeoAPI.1.7.3\lib\net45-client\GeoAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite, Version=1.13.3.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NetTopologySuite.1.13.3.2\lib\net45\NetTopologySuite.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.GeoTools, Version=1.13.3.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.GeoTools.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.MsSqlSpatial">
+      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.MsSqlSpatial.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.PostGis">
+      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.PostGis.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.ShapeFile">
+      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.ShapeFile.dll</HintPath>
+    </Reference>
+    <Reference Include="PowerCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NetTopologySuite.1.13.3.2\lib\net45\PowerCollections.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -49,6 +74,9 @@
       <Project>{9f71ba15-a1c9-4953-95e6-ab1a0d77565f}</Project>
       <Name>DorTaxDataContracts</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

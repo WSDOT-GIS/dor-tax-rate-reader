@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LocationCodeBoundary.cs" />
     <Compile Include="TaxRateItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

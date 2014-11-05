@@ -4,16 +4,23 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using NetTopologySuite.IO;
 using TaxRateDict = System.Collections.Generic.Dictionary<string, Wsdot.Dor.Tax.DataContracts.TaxRateItem>;
+using System.Linq;
 
 namespace Wsdot.Dor.Tax
 {
 	using Wsdot.Dor.Tax.DataContracts;
 	using QuarterDict = Dictionary<int, TaxRateDict>;
+	using NetTopologySuite.Geometries;
+	using System.Diagnostics;
+	using GeoAPI.Geometries;
 
 	public class DorTaxRateReader
 	{
 		const string _url_pattern = "http://dor.wa.gov/downloads/Add_Data/Rates{0}Q{1}.zip";
+		// LOCCODE_PUBLIC_14Q4.zip
+		const string _loc_code_boundaries_shp_url_pattern = "http://dor.wa.gov/downloads/LocBounds/LOCCODE_PUBLIC_{0:yy}Q{1}.zip";
 		const string _csv_pattern = "Rates{0}Q{1}.csv";
 		const string _date_format = "yyyyMMdd";
 
@@ -23,35 +30,77 @@ namespace Wsdot.Dor.Tax
 		/// Gets the quarter for the given date.
 		/// </summary>
 		/// <param name="date"></param>
-		/// <returns></returns>
+		/// <returns>Returns the quarter that the given month falls into (1-4).</returns>
 		public static int GetQuarter(DateTime date)
 		{
-			switch (date.Month)
+			double mDiv3 = date.Month / 3;
+			return Convert.ToInt32(Math.Ceiling(mDiv3));
+		}
+
+		public static Dictionary<string, byte[]> GetTaxBoundaries(DateTime date = default(DateTime))
+		{
+			if (date == default(DateTime))
 			{
-				case 1:
-				case 2:
-				case 3:
-					return 1;
-				case 4:
-				case 5:
-				case 6:
-					return 2;
-				case 7:
-				case 8:
-				case 9:
-					return 3;
-				case 10:
-				case 11:
-				case 12:
-				default:
-					return 4;
+				date = DateTime.Today;
 			}
+			int quarter = GetQuarter(date);
+			var uri = new Uri(string.Format(_loc_code_boundaries_shp_url_pattern, date, quarter));
+			// Get the path to the TEMP directory.
+			string tempDirPath = Path.GetTempPath();
+			string dir = Path.Combine(tempDirPath, Path.GetRandomFileName());
+			DirectoryInfo dirInfo = Directory.CreateDirectory(dir);
+			string shp_name = null;
+
+			var dict = new Dictionary<string, byte[]>();
+
+			try
+			{
+				var client = new HttpClient();
+				client.GetStreamAsync(uri).ContinueWith(st =>
+				{
+					// Write the shapefile to a temporary location.
+					using (var zipArchive = new ZipArchive(st.Result, ZipArchiveMode.Read))
+					{
+						foreach (var entry in zipArchive.Entries)
+						{
+							using (var outfile = File.Create(Path.Combine(dir, entry.Name)))
+							using (var sourcefile = entry.Open())
+							{
+								sourcefile.CopyToAsync(outfile).Wait();
+							}
+							if (entry.Name.EndsWith(".shp", StringComparison.InvariantCultureIgnoreCase))
+							{
+								shp_name = Path.Combine(dir, entry.Name);
+							}
+						}
+					}
+				}).Wait();
+
+				using (var shapefileReader = new ShapefileDataReader(shp_name, new OgcCompliantGeometryFactory()))
+				{
+					int locCodeId = shapefileReader.GetOrdinal("LOCCODE");
+
+					while (shapefileReader.Read())
+					{
+						string locCode = shapefileReader.GetString(locCodeId);
+						IGeometry shape = shapefileReader.Geometry;
+						dict.Add(locCode, shape != null ? shape.AsBinary() : null);
+					}
+				}
+
+			}
+			finally
+			{
+				dirInfo.Delete(true);
+			}
+
+			return dict;
 		}
 
 		/// <summary>
 		/// Gets the tax rates for the given date. If no date is given, <see cref="DateTime.Today"/> is assumed.
 		/// </summary>
-		/// <param name="date"></param>
+		/// <param name="date">A date. If no date is given, <see cref="DateTime.Today"/> is assumed</param>
 		/// <returns></returns>
 		public static TaxRateDict GetTaxRates(DateTime date = default(DateTime))
 		{
@@ -87,7 +136,7 @@ namespace Wsdot.Dor.Tax
 							{
 								line = streamReader.ReadLine();
 								var taxRateItem = ToTaxRateItem(line);
-								output.Add(taxRateItem.Code, taxRateItem);
+								output.Add(taxRateItem.LocationCode, taxRateItem);
 							}
 						}
 					}
@@ -117,7 +166,7 @@ namespace Wsdot.Dor.Tax
 			var taxRateItem = new TaxRateItem
 			{
 				Name = parts[0],
-				Code = parts[1],
+				LocationCode = parts[1],
 				State = float.Parse(parts[2]),
 				Local = float.Parse(parts[3]),
 				Rta = float.Parse(parts[4]),

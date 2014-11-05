@@ -14,7 +14,7 @@ namespace Wsdot.Dor.Tax.DataContracts
 		/// <summary>
 		/// Location code number
 		/// </summary>
-		public string Code { get; set; }
+		public string LocationCode { get; set; }
 		/// <summary>
 		/// State rate
 		/// </summary>

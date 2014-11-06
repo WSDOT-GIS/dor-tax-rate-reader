@@ -24,14 +24,18 @@ namespace Wsdot.Dor.Tax
 
 		static QuarterDict _storedRates = new QuarterDict();
 
-		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(DateTime date = default(DateTime))
+		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(DateTime date)
 		{
 			if (date == default(DateTime))
 			{
 				date = DateTime.Today;
 			}
-			int quarter = QuarterYear.GetQuarter(date);
-			var uri = new Uri(string.Format(_locCodeBoundariesShpUrlPattern, date, quarter));
+			return EnumerateLocationCodeBoundaries(new QuarterYear(date));
+		}
+
+		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(QuarterYear quarterYear)
+		{
+			var uri = new Uri(string.Format(_locCodeBoundariesShpUrlPattern, quarterYear.GetDateRange()[0], quarterYear.Quarter));
 			// Get the path to the TEMP directory.
 			string tempDirPath = Path.GetTempPath();
 			string dir = Path.Combine(tempDirPath, Path.GetRandomFileName());
@@ -108,6 +112,10 @@ namespace Wsdot.Dor.Tax
 		/// <returns></returns>
 		public static TaxRateDict GetTaxRates(DateTime date = default(DateTime))
 		{
+			if (date == default(DateTime))
+			{
+				date = DateTime.Today;
+			}
 			return GetTaxRates(new QuarterYear(date));
 		}
 
@@ -139,7 +147,7 @@ namespace Wsdot.Dor.Tax
 					}
 				}).Wait();
 
-				// Store the rates for this quarter so they don't need to be retrieved again.
+				// Store the rates for this quarterYear so they don't need to be retrieved again.
 				_storedRates.Add(quarterYear, output);
 			}
 

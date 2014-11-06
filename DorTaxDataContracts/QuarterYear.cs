@@ -149,5 +149,14 @@ namespace Wsdot.Dor.Tax.DataContracts
 			double mDiv3 = date.Month / 3;
 			return Convert.ToInt32(Math.Ceiling(mDiv3));
 		}
+
+		/// <summary>
+		/// Determines if the specified values for the <see cref="QuarterYear"/> are valid.
+		/// </summary>
+		/// <returns>Returns true if valid, false if not.</returns>
+		public bool IsValid()
+		{
+			return (this.Year == 2008 && this.Quarter >= 4 && this.Quarter <= 4) || (this.Year > 2008 && this.Quarter >= 1 && this.Quarter <= 4);
+		}
 	}
 }

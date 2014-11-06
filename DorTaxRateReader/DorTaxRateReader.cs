@@ -108,21 +108,26 @@ namespace Wsdot.Dor.Tax
 		/// <returns></returns>
 		public static TaxRateDict GetTaxRates(DateTime date = default(DateTime))
 		{
-			if (date == default(DateTime)) {
-				date = DateTime.Today;
-			}
-			var qy = new QuarterYear(date);
+			return GetTaxRates(new QuarterYear(date));
+		}
 
+		/// <summary>
+		/// Gets the tax rates for the given date. If no date is given, <see cref="DateTime.Today"/> is assumed.
+		/// </summary>
+		/// <param name="quarterYear">A date. If no date is given, <see cref="DateTime.Today"/> is assumed</param>
+		/// <returns></returns>
+		public static TaxRateDict GetTaxRates(QuarterYear quarterYear)
+		{
 			TaxRateDict output = null;
 
-			if (_storedRates.ContainsKey(qy))
+			if (_storedRates.ContainsKey(quarterYear))
 			{
-				output = _storedRates[qy];
+				output = _storedRates[quarterYear];
 			}
 			else
 			{
 
-				Uri uri = new Uri(string.Format(_urlPattern, date.Year, qy.Quarter));
+				Uri uri = new Uri(string.Format(_urlPattern, quarterYear.Year, quarterYear.Quarter));
 
 				var client = new HttpClient();
 				client.GetStreamAsync(uri).ContinueWith(responseTask =>
@@ -134,8 +139,8 @@ namespace Wsdot.Dor.Tax
 					}
 				}).Wait();
 
-				// Store the rates for this qy so they don't need to be retrieved again.
-				_storedRates.Add(qy, output);
+				// Store the rates for this quarter so they don't need to be retrieved again.
+				_storedRates.Add(quarterYear, output);
 			}
 
 

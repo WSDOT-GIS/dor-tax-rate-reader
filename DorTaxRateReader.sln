@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DorTaxDataContracts", "DorT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DorTaxRateWeb", "DorTaxRateWeb\DorTaxRateWeb.csproj", "{FE01BA28-8582-46D5-A98E-75373A99813B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0C4DD9D-1BF6-4447-9FB8-85E85F089182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE01BA28-8582-46D5-A98E-75373A99813B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE01BA28-8582-46D5-A98E-75373A99813B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE01BA28-8582-46D5-A98E-75373A99813B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE01BA28-8582-46D5-A98E-75373A99813B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -57,7 +57,10 @@ namespace DorTaxRateWeb.Controllers
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
 		public HttpResponseMessage GetSalesTaxJursitictionBoundaries(int year, int quarter)
 		{
-			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter)).ToDictionary(k => k.Key, kvp => kvp.Value != null ? kvp.Value.AsText() : null);
+			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter)).Select(feature => new {
+				LocationCode = feature.Attributes["LocationCode"],
+				Wkt = feature.Geometry != null ? feature.Geometry.AsText() : null
+			}).ToDictionary(k => k.LocationCode, v => v.Wkt);
 			var response = this.Request.CreateResponse(boundaries);
 			return response;
 		}

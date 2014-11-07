@@ -11,6 +11,7 @@ using TaxRateDict = System.Collections.Generic.Dictionary<string, Wsdot.Dor.Tax.
 namespace Wsdot.Dor.Tax
 {
 	using GeoAPI.Geometries;
+	using NetTopologySuite.Features;
 	using NetTopologySuite.Geometries;
 	using Wsdot.Dor.Tax.DataContracts;
 	using QuarterDict = Dictionary<QuarterYear, TaxRateDict>;
@@ -25,7 +26,7 @@ namespace Wsdot.Dor.Tax
 
 		static QuarterDict _storedRates = new QuarterDict();
 
-		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(DateTime date)
+		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(DateTime date)
 		{
 			if (date == default(DateTime))
 			{
@@ -34,7 +35,7 @@ namespace Wsdot.Dor.Tax
 			return EnumerateLocationCodeBoundaries(new QuarterYear(date));
 		}
 
-		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(QuarterYear quarterYear)
+		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(QuarterYear quarterYear)
 		{
 			var uri = new Uri(string.Format(_locCodeBoundariesShpUrlPattern, quarterYear.GetDateRange()[0], quarterYear.Quarter));
 			// Get the path to the TEMP directory.
@@ -78,7 +79,7 @@ namespace Wsdot.Dor.Tax
 			}
 		}
 
-		public static IEnumerable<KeyValuePair<string, IGeometry>> EnumerateLocationCodeBoundaries(string shapePath)
+		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(string shapePath)
 		{
 			using (var shapefileReader = new ShapefileDataReader(shapePath, new OgcCompliantGeometryFactory()))
 			{
@@ -88,23 +89,25 @@ namespace Wsdot.Dor.Tax
 				{
 					string locCode = shapefileReader.GetString(locCodeId);
 					var shape = shapefileReader.Geometry;
-					yield return new KeyValuePair<string, IGeometry>(locCode, shape);
+					var attributes = new AttributesTable();
+					attributes.AddAttribute("LocationCode", locCode);
+					yield return new Feature(shape, attributes);
 				}
 			}
 		}
 
-		public static Dictionary<string, byte[]> GetTaxBoundaries(DateTime date = default(DateTime))
-		{
-			var dict = new Dictionary<string, byte[]>();
+		////public static Dictionary<string, byte[]> GetTaxBoundaries(DateTime date = default(DateTime))
+		////{
+		////	var dict = new Dictionary<string, byte[]>();
 
-			foreach (var kvp in EnumerateLocationCodeBoundaries(date))
-			{
-				dict.Add(kvp.Key,  kvp.Value != null ? kvp.Value.AsBinary() : null);
-			}
+		////	foreach (var kvp in EnumerateLocationCodeBoundaries(date))
+		////	{
+		////		dict.Add(kvp.Key,  kvp.Value != null ? kvp.Value.AsBinary() : null);
+		////	}
 
 
-			return dict;
-		}
+		////	return dict;
+		////}
 
 		/// <summary>
 		/// Gets the tax rates for the given date. If no date is given, <see cref="DateTime.Today"/> is assumed.

@@ -147,7 +147,7 @@ namespace Wsdot.Dor.Tax.DataContracts
 		public static int GetQuarter(DateTime date)
 		{
 			double mDiv3 = date.Month / 3;
-			return Convert.ToInt32(Math.Ceiling(mDiv3));
+			return Convert.ToInt32(Math.Ceiling(mDiv3) + 1);
 		}
 
 		/// <summary>

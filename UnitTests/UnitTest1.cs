@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using Wsdot.Dor.Tax;
+using Wsdot.Dor.Tax.DataContracts;
 
 namespace UnitTests
 {
@@ -10,6 +12,14 @@ namespace UnitTests
 	{
 
 		public TestContext TestContext { get; set; }
+
+		[TestMethod]
+		public void TestQuarterYear()
+		{
+			var qy = new QuarterYear(new DateTime(2014, 1, 1));
+			Assert.AreEqual(2014, qy.Year);
+			Assert.AreEqual(1, qy.Quarter);
+		}
 
 		[TestMethod]
 		public void TestGetRates()

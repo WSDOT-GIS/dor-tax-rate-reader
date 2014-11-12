@@ -1,7 +1,13 @@
-﻿using System;
+﻿using NetTopologySuite.CoordinateSystems;
+using NetTopologySuite.Features;
+using NetTopologySuite.IO;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web.Http;
 using WebApi.OutputCache.V2;
 using Wsdot.Dor.Tax;
@@ -51,15 +57,36 @@ namespace DorTaxRateWeb.Controllers
 		/// </summary>
 		/// <param name="year">A year. Minimum allowed value is 2008.</param>
 		/// <param name="quarterYear">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
-		/// <returns></returns>
+		/// <returns>Returns a GeoJSON FeatureCollection.</returns>
 		[Route("boundaries/{year:min(2008)}/{quarter:range(1,4)}")]
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
-		public Dictionary<string, string> GetSalesTaxJursitictionBoundaries(int year, int quarter)
+		public HttpResponseMessage GetSalesTaxJursitictionBoundaries(int year, int quarter)
 		{
-			return DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter)).Select(feature => new {
-				LocationCode = feature.Attributes["LocationCode"],
-				Wkt = feature.Geometry != null ? feature.Geometry.AsText() : null
-			}).ToDictionary(k => (string)k.LocationCode, v => v.Wkt);
+			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter));
+			var featureCollection = new FeatureCollection();
+			featureCollection.CRS = new NamedCRS("urn:ogc:def:crs:EPSG::2927");
+			foreach (var boundary in boundaries)
+			{
+				featureCollection.Add(boundary);
+			}
+
+			byte[] bytes;
+			using (var stream = new MemoryStream())
+			using (var textWriter = new StreamWriter(stream))
+			{
+				var serializer = new GeoJsonSerializer();
+				serializer.Serialize(textWriter, featureCollection);
+				textWriter.Flush();
+				bytes = stream.ToArray();
+			}
+			var response = this.Request.CreateResponse();
+			response.Content = new ByteArrayContent(bytes, 0, bytes.Length);
+			response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.geo+json");
+			response.StatusCode = HttpStatusCode.OK;
+			
+
+			return response;
+
 		}
 
 		/// <summary>

@@ -1,4 +1,6 @@
-﻿using NetTopologySuite.IO;
+﻿using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,15 +8,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using Wsdot.Dor.Tax.DataContracts;
-using TaxRateDict = System.Collections.Generic.Dictionary<string, Wsdot.Dor.Tax.DataContracts.TaxRateItem>;
 
 namespace Wsdot.Dor.Tax
 {
-	using GeoAPI.Geometries;
-	using NetTopologySuite.Features;
-	using NetTopologySuite.Geometries;
-	using Wsdot.Dor.Tax.DataContracts;
-	using QuarterDict = Dictionary<QuarterYear, TaxRateDict>;
 
 	public class DorTaxRateReader
 	{
@@ -24,17 +20,11 @@ namespace Wsdot.Dor.Tax
 		const string _csv_pattern = "Rates{0}Q{1}.csv";
 		const string _date_format = "yyyyMMdd";
 
-		static QuarterDict _storedRates = new QuarterDict();
-
-		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(DateTime date)
-		{
-			if (date == default(DateTime))
-			{
-				date = DateTime.Today;
-			}
-			return EnumerateLocationCodeBoundaries(new QuarterYear(date));
-		}
-
+		/// <summary>
+		/// Enumerates through location code boundary features.
+		/// </summary>
+		/// <param name="quarterYear">A quarter year.</param>
+		/// <returns>Returns an <see cref="IEnumerable&lt;T&gt;"/> of <see cref="Feature"/> objects.</returns>
 		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(QuarterYear quarterYear)
 		{
 			var uri = new Uri(string.Format(_locCodeBoundariesShpUrlPattern, quarterYear.GetDateRange()[0], quarterYear.Quarter));
@@ -79,6 +69,11 @@ namespace Wsdot.Dor.Tax
 			}
 		}
 
+		/// <summary>
+		/// Enumerates through location code boundary features in a shapefile.
+		/// </summary>
+		/// <param name="shapePath">The path to a shapefile.</param>
+		/// <returns>Returns an <see cref="IEnumerable&lt;T&gt;"/> of <see cref="Feature"/> objects.</returns>
 		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(string shapePath)
 		{
 			using (var shapefileReader = new ShapefileDataReader(shapePath, new OgcCompliantGeometryFactory()))
@@ -96,70 +91,31 @@ namespace Wsdot.Dor.Tax
 			}
 		}
 
-		////public static Dictionary<string, byte[]> GetTaxBoundaries(DateTime date = default(DateTime))
-		////{
-		////	var dict = new Dictionary<string, byte[]>();
-
-		////	foreach (var kvp in EnumerateLocationCodeBoundaries(date))
-		////	{
-		////		dict.Add(kvp.Key,  kvp.Value != null ? kvp.Value.AsBinary() : null);
-		////	}
-
-
-		////	return dict;
-		////}
-
 		/// <summary>
 		/// Gets the tax rates for the given date. If no date is given, <see cref="DateTime.Today"/> is assumed.
 		/// </summary>
-		/// <param name="date">A date. If no date is given, <see cref="DateTime.Today"/> is assumed</param>
-		/// <returns></returns>
-		public static TaxRateDict GetTaxRates(DateTime date = default(DateTime))
+		/// <param name="quarterYear">A quarter year.</param>
+		/// <returns>Enumeration of <see cref="TaxRateItem"/></returns>
+		public static IEnumerable<TaxRateItem> EnemerateTaxRates(QuarterYear quarterYear)
 		{
-			if (date == default(DateTime))
+			Uri uri = new Uri(string.Format(_urlPattern, quarterYear.Year, quarterYear.Quarter));
+
+			var client = new HttpClient();
+			Stream zipStream = null;
+				
+			client.GetStreamAsync(uri).ContinueWith(responseTask =>
 			{
-				date = DateTime.Today;
-			}
-			return GetTaxRates(new QuarterYear(date));
+				zipStream = responseTask.Result;
+			}).Wait();
+
+			return EnumerateZippedTaxRateCsv(zipStream);
 		}
 
 		/// <summary>
-		/// Gets the tax rates for the given date. If no date is given, <see cref="DateTime.Today"/> is assumed.
+		/// Gets the tax rates from a zipped CSV file.
 		/// </summary>
-		/// <param name="quarterYear">A date. If no date is given, <see cref="DateTime.Today"/> is assumed</param>
-		/// <returns></returns>
-		public static TaxRateDict GetTaxRates(QuarterYear quarterYear)
-		{
-			TaxRateDict output = null;
-
-			if (_storedRates.ContainsKey(quarterYear))
-			{
-				output = _storedRates[quarterYear];
-			}
-			else
-			{
-
-				Uri uri = new Uri(string.Format(_urlPattern, quarterYear.Year, quarterYear.Quarter));
-
-				var client = new HttpClient();
-				client.GetStreamAsync(uri).ContinueWith(responseTask =>
-				{
-					output = new TaxRateDict();
-					foreach (var item in EnumerateZippedTaxRateCsv(responseTask.Result))
-					{
-						output.Add(item.LocationCode, item);
-					}
-				}).Wait();
-
-				// Store the rates for this quarterYear so they don't need to be retrieved again.
-				_storedRates.Add(quarterYear, output);
-			}
-
-
-
-			return output;
-		}
-
+		/// <param name="zipFile">ZIP file containing CSV.</param>
+		/// <returns>Enumeration of <see cref="TaxRateItem"/></returns>
 		public static IEnumerable<TaxRateItem> EnumerateZippedTaxRateCsv(Stream zipFile)
 		{
 			using (var zipArchive = new ZipArchive(zipFile, ZipArchiveMode.Read))
@@ -175,6 +131,11 @@ namespace Wsdot.Dor.Tax
 			}
 		}
 
+		/// <summary>
+		/// Gets the tax rates from a CSV file.
+		/// </summary>
+		/// <param name="csvFile">CSV file.</param>
+		/// <returns>Enumeration of <see cref="TaxRateItem"/></returns>
 		public static IEnumerable<TaxRateItem> EnumerateTaxRateCsv(Stream csvFile)
 		{
 			using (var streamReader = new StreamReader(csvFile))

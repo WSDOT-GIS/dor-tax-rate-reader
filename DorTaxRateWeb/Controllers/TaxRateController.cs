@@ -1,12 +1,7 @@
-﻿using NetTopologySuite.Features;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Web.Http;
 using WebApi.OutputCache.V2;
 using Wsdot.Dor.Tax;
@@ -31,21 +26,19 @@ namespace DorTaxRateWeb.Controllers
 		/// <returns>Returns a list of <see cref="TaxRateItem"/> objects.</returns>
 		[Route("rates/{year:min(2008)}/{quarter:range(1,4)}")]
 		[CacheOutput(ServerTimeSpan=_defaultCache, ClientTimeSpan=_defaultCache)]
-		public HttpResponseMessage GetTaxRates(int year, int quarter)
+		public IEnumerable<TaxRateItem> GetTaxRates(int year, int quarter)
 		{
-			IEnumerable<TaxRateItem> taxRates = DorTaxRateReader.GetTaxRates(new QuarterYear(year, quarter)).Select(kvp => kvp.Value);
-			var response = this.Request.CreateResponse<IEnumerable<TaxRateItem>>(taxRates);
-			return response;
+			return DorTaxRateReader.EnemerateTaxRates(new QuarterYear(year, quarter));
 		}
 
 		/// <summary>
-		/// Gets the current tax rates by redirecting to <see cref="GetCurrentTaxRates(int, int)"/> for the current quarterYear-year.
+		/// Gets the current tax rates by redirecting to <see cref="GetCurrentTaxRates(int, int)"/> for the current quarter-year.
 		/// </summary>
 		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetCurrentTaxRates(int, int)"/>.</returns>
 		[Route("rates")]
 		public HttpResponseMessage GetCurrentTaxRates()
 		{
-			var qy = new QuarterYear(DateTime.Now);
+			var qy = QuarterYear.Current;
 			string newUrl = this.Request.RequestUri.ToString().TrimEnd('/') + string.Format("/{0}/{1}", qy.Year, qy.Quarter);
 			var response = this.Request.CreateResponse(System.Net.HttpStatusCode.Redirect);
 			response.Headers.Location = new Uri(newUrl);
@@ -53,22 +46,30 @@ namespace DorTaxRateWeb.Controllers
 		}
 
 
+		/// <summary>
+		/// Gets sales tax juristiction boundaries for the given quarter-year.
+		/// </summary>
+		/// <param name="year">A year. Minimum allowed value is 2008.</param>
+		/// <param name="quarterYear">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
+		/// <returns></returns>
 		[Route("boundaries/{year:min(2008)}/{quarter:range(1,4)}")]
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
-		public HttpResponseMessage GetSalesTaxJursitictionBoundaries(int year, int quarter)
+		public Dictionary<string, string> GetSalesTaxJursitictionBoundaries(int year, int quarter)
 		{
-			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter)).Select(feature => new {
+			return DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter)).Select(feature => new {
 				LocationCode = feature.Attributes["LocationCode"],
 				Wkt = feature.Geometry != null ? feature.Geometry.AsText() : null
-			}).ToDictionary(k => k.LocationCode, v => v.Wkt);
-			var response = this.Request.CreateResponse(boundaries);
-			return response;
+			}).ToDictionary(k => (string)k.LocationCode, v => v.Wkt);
 		}
 
+		/// <summary>
+		/// Gets current juristiction boundaries by redirecting to <see cref="GetSalesTaxJuristictionBoundaries(int, int)"/>.
+		/// </summary>
+		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetSalesTaxJuristictionBoundaries(int, int)"/>.</returns>
 		[Route("boundaries")]
 		public HttpResponseMessage GetCurrentSalesTaxJuristictionBoundaries()
 		{
-			var qy = new QuarterYear(DateTime.Now);
+			var qy = QuarterYear.Current;
 			string newUrl = this.Request.RequestUri.ToString().TrimEnd('/') + string.Format("/{0}/{1}", qy.Year, qy.Quarter);
 			var response = this.Request.CreateResponse(System.Net.HttpStatusCode.Redirect);
 			response.Headers.Location = new Uri(newUrl);

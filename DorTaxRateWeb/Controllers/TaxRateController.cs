@@ -60,7 +60,7 @@ namespace DorTaxRateWeb.Controllers
 		/// <returns>Returns a GeoJSON FeatureCollection.</returns>
 		[Route("boundaries/{year:min(2008)}/{quarter:range(1,4)}")]
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
-		public HttpResponseMessage GetSalesTaxJursitictionBoundaries(int year, int quarter)
+		public FeatureCollection GetSalesTaxJursitictionBoundaries(int year, int quarter)
 		{
 			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter));
 			var featureCollection = new FeatureCollection();
@@ -70,23 +70,7 @@ namespace DorTaxRateWeb.Controllers
 				featureCollection.Add(boundary);
 			}
 
-			byte[] bytes;
-			using (var stream = new MemoryStream())
-			using (var textWriter = new StreamWriter(stream))
-			{
-				var serializer = new GeoJsonSerializer();
-				serializer.Serialize(textWriter, featureCollection);
-				textWriter.Flush();
-				bytes = stream.ToArray();
-			}
-			var response = this.Request.CreateResponse();
-			response.Content = new ByteArrayContent(bytes, 0, bytes.Length);
-			response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.geo+json");
-			response.StatusCode = HttpStatusCode.OK;
-			
-
-			return response;
-
+			return featureCollection;
 		}
 
 		/// <summary>

@@ -28,7 +28,7 @@ namespace DorTaxRateWeb.Controllers
 		/// Gets the tax rates for a specific quarterYear year.
 		/// </summary>
 		/// <param name="year">A year. Minimum allowed value is 2008.</param>
-		/// <param name="quarterYear">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
+		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
 		/// <returns>Returns a list of <see cref="TaxRateItem"/> objects.</returns>
 		[Route("rates/{year:min(2008)}/{quarter:range(1,4)}")]
 		[CacheOutput(ServerTimeSpan=_defaultCache, ClientTimeSpan=_defaultCache)]
@@ -38,9 +38,9 @@ namespace DorTaxRateWeb.Controllers
 		}
 
 		/// <summary>
-		/// Gets the current tax rates by redirecting to <see cref="GetCurrentTaxRates(int, int)"/> for the current quarter-year.
+		/// Gets the current tax rates by redirecting to <see cref="GetTaxRates(int, int)"/> for the current quarter-year.
 		/// </summary>
-		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetCurrentTaxRates(int, int)"/>.</returns>
+		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetTaxRates(int, int)"/>.</returns>
 		[Route("rates")]
 		public HttpResponseMessage GetCurrentTaxRates()
 		{
@@ -56,7 +56,7 @@ namespace DorTaxRateWeb.Controllers
 		/// Gets sales tax juristiction boundaries for the given quarter-year.
 		/// </summary>
 		/// <param name="year">A year. Minimum allowed value is 2008.</param>
-		/// <param name="quarterYear">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
+		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
 		/// <returns>Returns a GeoJSON FeatureCollection.</returns>
 		[Route("boundaries/{year:min(2008)}/{quarter:range(1,4)}")]
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
@@ -90,9 +90,9 @@ namespace DorTaxRateWeb.Controllers
 		}
 
 		/// <summary>
-		/// Gets current juristiction boundaries by redirecting to <see cref="GetSalesTaxJuristictionBoundaries(int, int)"/>.
+		/// Gets current juristiction boundaries by redirecting to <see cref="GetSalesTaxJursitictionBoundaries(int, int)"/>.
 		/// </summary>
-		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetSalesTaxJuristictionBoundaries(int, int)"/>.</returns>
+		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetSalesTaxJursitictionBoundaries(int, int)"/>.</returns>
 		[Route("boundaries")]
 		public HttpResponseMessage GetCurrentSalesTaxJuristictionBoundaries()
 		{

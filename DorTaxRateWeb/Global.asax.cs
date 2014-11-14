@@ -1,4 +1,5 @@
-﻿using DorTaxRateWeb.Areas.HelpPage;
+﻿#pragma warning disable 1591
+using DorTaxRateWeb.Areas.HelpPage;
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -45,3 +46,4 @@ namespace DorTaxRateWeb
 		}
 	}
 }
+#pragma warning restore 1591

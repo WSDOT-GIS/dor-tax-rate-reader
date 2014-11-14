@@ -74,7 +74,7 @@ namespace DorTaxRateWeb.Controllers
 		}
 
 		/// <summary>
-		/// Gets current juristiction boundaries by redirecting to <see cref="GetSalesTaxJursitictionBoundaries(int, int)"/>.
+		/// Gets current juristiction boundaries by redirecting to the current quarter's juristiction boundaries endpoint.
 		/// </summary>
 		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetSalesTaxJursitictionBoundaries(int, int)"/>.</returns>
 		[Route("boundaries")]

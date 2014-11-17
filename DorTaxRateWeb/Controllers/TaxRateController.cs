@@ -25,7 +25,7 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		const int _defaultCache = 365*24*60*60*60;
 
 		/// <summary>
-		/// Gets the tax rates for a specific quarterYear year.
+		/// Gets the tax rates for a specific quarter-year year.
 		/// </summary>
 		/// <param name="year">A year. Minimum allowed value is 2008.</param>
 		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>

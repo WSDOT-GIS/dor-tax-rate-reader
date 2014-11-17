@@ -128,7 +128,7 @@ namespace Wsdot.Dor.Tax.DataContracts
 		}
 
 		/// <summary>
-		/// Determines if two <see cref="QuarterYear"/> values are notequal.
+		/// Determines if two <see cref="QuarterYear"/> values are not equal.
 		/// </summary>
 		/// <param name="q1"></param>
 		/// <param name="q2"></param>

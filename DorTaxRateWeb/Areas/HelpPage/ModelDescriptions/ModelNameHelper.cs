@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace DorTaxRateWeb.Areas.HelpPage.ModelDescriptions
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage.ModelDescriptions
 {
     internal static class ModelNameHelper
     {

@@ -1,10 +1,10 @@
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
-using DorTaxRateWeb.Areas.HelpPage.ModelDescriptions;
-using DorTaxRateWeb.Areas.HelpPage.Models;
+using Wsdot.Dor.Tax.Web.Areas.HelpPage.ModelDescriptions;
+using Wsdot.Dor.Tax.Web.Areas.HelpPage.Models;
 
-namespace DorTaxRateWeb.Areas.HelpPage.Controllers
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage.Controllers
 {
     /// <summary>
     /// The controller that will handle requests for the help page.

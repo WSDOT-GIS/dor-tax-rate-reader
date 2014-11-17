@@ -1,7 +1,7 @@
 using System.Web.Http;
 using System.Web.Mvc;
 
-namespace DorTaxRateWeb.Areas.HelpPage
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage
 {
     public class HelpPageAreaRegistration : AreaRegistration
     {

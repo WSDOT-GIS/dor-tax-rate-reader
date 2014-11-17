@@ -3,7 +3,7 @@ using System.Text;
 using System.Web;
 using System.Web.Http.Description;
 
-namespace DorTaxRateWeb.Areas.HelpPage
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage
 {
     public static class ApiDescriptionExtensions
     {

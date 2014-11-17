@@ -9,7 +9,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web;
 
-namespace DorTaxRateWeb.Formatters
+namespace Wsdot.Dor.Tax.Web.Formatters
 {
 	/// <summary>
 	/// Writes GeoJSON.

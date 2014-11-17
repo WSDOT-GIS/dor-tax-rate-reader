@@ -13,7 +13,7 @@ using WebApi.OutputCache.V2;
 using Wsdot.Dor.Tax;
 using Wsdot.Dor.Tax.DataContracts;
 
-namespace DorTaxRateWeb.Controllers
+namespace Wsdot.Dor.Tax.Web.Controllers
 {
 	/// <summary>
 	/// Provides access to tax rate data from 

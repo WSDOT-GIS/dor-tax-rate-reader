@@ -1,10 +1,10 @@
 ﻿#pragma warning disable 1591
-using DorTaxRateWeb.Areas.HelpPage;
+using Wsdot.Dor.Tax.Web.Areas.HelpPage;
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
 
-namespace DorTaxRateWeb
+namespace Wsdot.Dor.Tax.Web
 {
 	public class Global : System.Web.HttpApplication
 	{

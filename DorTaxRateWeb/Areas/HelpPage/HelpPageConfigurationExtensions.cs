@@ -11,10 +11,10 @@ using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
-using DorTaxRateWeb.Areas.HelpPage.ModelDescriptions;
-using DorTaxRateWeb.Areas.HelpPage.Models;
+using Wsdot.Dor.Tax.Web.Areas.HelpPage.ModelDescriptions;
+using Wsdot.Dor.Tax.Web.Areas.HelpPage.Models;
 
-namespace DorTaxRateWeb.Areas.HelpPage
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage
 {
     public static class HelpPageConfigurationExtensions
     {

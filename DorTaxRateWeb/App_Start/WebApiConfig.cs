@@ -1,7 +1,7 @@
-﻿using DorTaxRateWeb.Formatters;
+﻿using Wsdot.Dor.Tax.Web.Formatters;
 using System.Web.Http;
 
-namespace DorTaxRateWeb
+namespace Wsdot.Dor.Tax.Web
 {
 	/// <summary>
 	/// Configures WebAPI.

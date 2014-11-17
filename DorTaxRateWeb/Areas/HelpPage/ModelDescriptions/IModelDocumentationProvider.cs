@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace DorTaxRateWeb.Areas.HelpPage.ModelDescriptions
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage.ModelDescriptions
 {
     public interface IModelDocumentationProvider
     {

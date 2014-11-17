@@ -1,6 +1,6 @@
 using System;
 
-namespace DorTaxRateWeb.Areas.HelpPage.ModelDescriptions
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage.ModelDescriptions
 {
     public class ParameterAnnotation
     {

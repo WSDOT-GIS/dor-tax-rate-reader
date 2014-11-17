@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace DorTaxRateWeb.Areas.HelpPage.ModelDescriptions
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage.ModelDescriptions
 {
     public class ParameterDescription
     {

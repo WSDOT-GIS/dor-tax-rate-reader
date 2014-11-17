@@ -1,4 +1,4 @@
-namespace DorTaxRateWeb.Areas.HelpPage
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage
 {
     /// <summary>
     /// Indicates whether the sample is used for request or response

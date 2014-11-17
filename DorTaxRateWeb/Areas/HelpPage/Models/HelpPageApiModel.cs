@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Web.Http.Description;
-using DorTaxRateWeb.Areas.HelpPage.ModelDescriptions;
+using Wsdot.Dor.Tax.Web.Areas.HelpPage.ModelDescriptions;
 
-namespace DorTaxRateWeb.Areas.HelpPage.Models
+namespace Wsdot.Dor.Tax.Web.Areas.HelpPage.Models
 {
     /// <summary>
     /// The model that represents an API displayed on the help page.

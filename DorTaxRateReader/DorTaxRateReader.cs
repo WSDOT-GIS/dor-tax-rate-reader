@@ -1,6 +1,5 @@
-﻿using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
+﻿using DotSpatial.Data;
+using DotSpatial.Projections;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,8 +23,9 @@ namespace Wsdot.Dor.Tax
 		/// Enumerates through location code boundary features.
 		/// </summary>
 		/// <param name="quarterYear">A quarter year.</param>
+		/// <param name="targetProjection">Optional. Provide to reproject from 2927.</param>
 		/// <returns>Returns an <see cref="IEnumerable&lt;T&gt;"/> of <see cref="Feature"/> objects.</returns>
-		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(QuarterYear quarterYear)
+		public static IEnumerable<IFeature> EnumerateLocationCodeBoundaries(QuarterYear quarterYear, ProjectionInfo targetProjection = null)
 		{
 			var uri = new Uri(string.Format(_locCodeBoundariesShpUrlPattern, quarterYear.GetDateRange()[0], quarterYear.Quarter));
 			// Get the path to the TEMP directory.
@@ -73,22 +73,23 @@ namespace Wsdot.Dor.Tax
 		/// Enumerates through location code boundary features in a shapefile.
 		/// </summary>
 		/// <param name="shapePath">The path to a shapefile.</param>
+		/// <param name="targetProjection">Optional. Provide to reproject from 2927.</param>
 		/// <returns>Returns an <see cref="IEnumerable&lt;T&gt;"/> of <see cref="Feature"/> objects.</returns>
-		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(string shapePath)
+		public static IEnumerable<IFeature> EnumerateLocationCodeBoundaries(string shapePath, ProjectionInfo targetProjection=null)
 		{
-			using (var shapefileReader = new ShapefileDataReader(shapePath, new OgcCompliantGeometryFactory()))
+			using (var fs = FeatureSet.Open(shapePath))
 			{
-				int locCodeId = shapefileReader.GetOrdinal("LOCCODE");
-
-				while (shapefileReader.Read())
+				if (targetProjection != null)
 				{
-					string locCode = shapefileReader.GetString(locCodeId);
-					var shape = shapefileReader.Geometry;
-					var attributes = new AttributesTable();
-					attributes.AddAttribute("LocationCode", locCode);
-					yield return new Feature(shape, attributes);
+					fs.Reproject(targetProjection);
+				}
+				for (int i = 0, l = fs.NumRows(); i < l; i++)
+				{
+					var feature = fs.GetFeature(i) as IFeature;
+					yield return feature;
 				}
 			}
+			
 		}
 
 		/// <summary>

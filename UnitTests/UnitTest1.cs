@@ -1,6 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
+﻿using DotSpatial.Data;
+using DotSpatial.Projections;
+using DotSpatial.Topology;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using Wsdot.Dor.Tax;
@@ -38,21 +39,22 @@ namespace UnitTests
 		[TestMethod]
 		public void GetLocationCodeBoundaries()
 		{
-			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(QuarterYear.Current).ToArray();
+			const int srid = 4326;
+			var targetProjection = ProjectionInfo.FromEpsgCode(srid);
+			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(QuarterYear.Current, targetProjection);
 
 			Assert.IsNotNull(boundaries);
-			CollectionAssert.AllItemsAreNotNull(boundaries);
-			CollectionAssert.AllItemsAreInstancesOfType(boundaries, typeof(Feature));
 
-			foreach (var feature in boundaries)
+			foreach (Feature feature in boundaries)
 			{
-				if (feature.Geometry == null)
+				if (feature.BasicGeometry == null)
 				{
+					
 					Assert.Fail("All features should have geometry.");
-					var polygon = feature.Geometry as Polygon;
+					var polygon = feature.BasicGeometry as Polygon;
 					if (polygon == null)
 					{
-						var multipoly = feature.Geometry as MultiPolygon;
+						var multipoly = feature.BasicGeometry as MultiPolygon;
 						if (multipoly == null)
 						{
 							Assert.Fail("All geometries must be either polygon or multipolygon.");
@@ -60,10 +62,14 @@ namespace UnitTests
 					}
 					break;
 				}
-				else if (feature.Attributes.Count < 1)
+				if (feature.DataRow == null)
 				{
 					Assert.Fail("All features should have attributes.");
 					break;
+				} else if (feature.DataRow["LOCCODE"] == null) {
+					Assert.Fail("All features should have \"LOCCODE\" attribute.");
+					break;
+
 				}
 			}
 

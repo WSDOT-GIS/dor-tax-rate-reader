@@ -76,7 +76,7 @@ namespace Wsdot.Dor.Tax
 		/// <returns>Returns an <see cref="IEnumerable&lt;T&gt;"/> of <see cref="Feature"/> objects.</returns>
 		public static IEnumerable<Feature> EnumerateLocationCodeBoundaries(string shapePath)
 		{
-			using (var shapefileReader = new ShapefileDataReader(shapePath, new OgcCompliantGeometryFactory()))
+			using (var shapefileReader = new ShapefileDataReader(shapePath, GeometryFactory.Default))
 			{
 				int locCodeId = shapefileReader.GetOrdinal("LOCCODE");
 

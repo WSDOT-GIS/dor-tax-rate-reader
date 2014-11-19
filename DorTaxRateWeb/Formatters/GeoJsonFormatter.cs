@@ -1,13 +1,10 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
-using System.Web;
 
 namespace Wsdot.Dor.Tax.Web.Formatters
 {

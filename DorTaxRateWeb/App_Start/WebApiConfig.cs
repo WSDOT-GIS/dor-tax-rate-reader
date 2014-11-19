@@ -1,5 +1,5 @@
-﻿using Wsdot.Dor.Tax.Web.Formatters;
-using System.Web.Http;
+﻿using System.Web.Http;
+using Wsdot.Dor.Tax.Web.Formatters;
 
 namespace Wsdot.Dor.Tax.Web
 {

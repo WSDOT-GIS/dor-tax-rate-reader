@@ -1,19 +1,10 @@
 ﻿using DotSpatial.Projections;
-using DotSpatial.Topology;
-using NetTopologySuite.CoordinateSystems;
 using NetTopologySuite.Features;
-using NetTopologySuite.IO;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Web.Http;
 using WebApi.OutputCache.V2;
-using Wsdot.Dor.Tax;
 using Wsdot.Dor.Tax.DataContracts;
 
 namespace Wsdot.Dor.Tax.Web.Controllers

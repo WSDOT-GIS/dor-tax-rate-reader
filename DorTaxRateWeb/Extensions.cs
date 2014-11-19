@@ -1,11 +1,9 @@
-﻿using NetTopologySuite.CoordinateSystems;
+﻿using DotSpatial.Topology;
+using NetTopologySuite.CoordinateSystems;
 using NetTopologySuite.Features;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Web;
-using DotSpatial.Topology;
 
 namespace Wsdot.Dor.Tax.Web
 {
@@ -19,6 +17,7 @@ namespace Wsdot.Dor.Tax.Web
 		/// </summary>
 		/// <param name="dataRow">A <see cref="DataRow"/></param>
 		/// <param name="omittedFields">Names of fields that will be omitted.</param>
+		/// <param name="aliases">This parameter allows you to provide aliases for the field names.</param>
 		/// <returns>An <see cref="AttributesTable"/> containing the data in the input <see cref="DataRow"/>.</returns>
 		public static AttributesTable ToAttributesTable(this DataRow dataRow, IEnumerable<string> omittedFields=null, IDictionary<string, string> aliases=null)
 		{
@@ -41,6 +40,7 @@ namespace Wsdot.Dor.Tax.Web
 		/// </summary>
 		/// <param name="features">DotSpatial features.</param>
 		/// <param name="omittedFields">Names of fields that will be omitted.</param>
+		/// <param name="aliases">This parameter allows you to provide aliases for the field names.</param>
 		/// <returns>NetTopologySuite features</returns>
 		public static IEnumerable<Feature> AsNtsFeatures(this IEnumerable<DotSpatial.Data.IFeature> features, IEnumerable<string> omittedFields = null, IDictionary<string, string> aliases = null)
 		{
@@ -56,6 +56,7 @@ namespace Wsdot.Dor.Tax.Web
 		/// <param name="features">DotSpatial features.</param>
 		/// <param name="outSR">The EPSG identifier for a spatial reference system.</param>
 		/// <param name="omittedFields">Names of fields that will be omitted.</param>
+		/// <param name="aliases">This parameter allows you to provide aliases for the field names.</param>
 		/// <returns>A NetTopologySuite feature collection</returns>
 		public static FeatureCollection ToNtsFeatureCollection(this IEnumerable<DotSpatial.Data.IFeature> features, int outSR, IEnumerable<string> omittedFields = null, IDictionary<string, string> aliases = null)
 		{

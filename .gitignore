@@ -6,6 +6,7 @@
 *.user
 *.sln.docstates
 docs
+DorTaxRateWeb/App_Data/XmlDocument.xml
 
 # Build results
 [Dd]ebug/
@@ -213,7 +214,3 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
-DorTaxRateWeb/App_Data/XmlDocument.xml
-DorTaxRateWeb/Utility/DotSpatialEx.cs
-DorTaxRateWeb/Utility/GeometryConverterToDotSpatial.cs
-DorTaxRateWeb/Utility/GeometryConverterToGeoAPI.cs

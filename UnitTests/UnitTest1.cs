@@ -72,19 +72,19 @@ namespace UnitTests
 
 				}
 			}
+		}
 
-			////// Create the output JSON filename.
-			////string jsonFN = System.IO.Path.Combine(TestContext.DeploymentDirectory, "boundaries.json");
+		[TestMethod]
+		public void GetCombinedTaxBoundaryFeatures()
+		{
+			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundariesWithTaxRates(QuarterYear.Current);
 
-			////// Serialize the results to JSON.
-			////var serializer = JsonSerializer.Create(new JsonSerializerSettings { Formatting = Formatting.Indented });
-			////using (var streamWriter = new StreamWriter(jsonFN))
-			////{
-			////	serializer.Serialize(streamWriter, boundaries);
-			////}
-			////TestContext.AddResultFile(jsonFN);
-
-
+			foreach (var feature in boundaries)
+			{
+				Assert.IsNotNull(feature, "No featurre should be null.");
+				Assert.IsTrue(feature.DataRow.ItemArray.Length >= 8);
+				CollectionAssert.AllItemsAreNotNull(feature.DataRow.ItemArray, "All columns should have values.");
+			}
 		}
 	}
 }

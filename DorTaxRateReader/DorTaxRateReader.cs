@@ -2,9 +2,11 @@
 using DotSpatial.Projections;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net.Http;
 using Wsdot.Dor.Tax.DataContracts;
 
@@ -172,6 +174,36 @@ namespace Wsdot.Dor.Tax
 				ExpirationDate = DateTime.ParseExact(parts[7], _date_format, DateTimeFormatInfo.CurrentInfo),
 			};
 			return taxRateItem;
+		}
+
+		public static IEnumerable<IFeature> EnumerateLocationCodeBoundariesWithTaxRates(QuarterYear quarterYear, ProjectionInfo targetProjection = null)
+		{
+			ILookup<string, TaxRateItem> taxRates = EnemerateTaxRates(quarterYear).ToLookup(item => item.LocationCode);
+			IEnumerable<IFeature> boundaries = EnumerateLocationCodeBoundaries(quarterYear, targetProjection);
+			foreach (var b in boundaries)
+			{
+				var taxRateInfo = taxRates[(string)b.DataRow[1]].First();
+				// Add data columns.
+				b.DataRow.Table.Columns.AddRange(new DataColumn[] {
+					new DataColumn("Name", typeof(string)),
+					new DataColumn("State", typeof(float)),
+					new DataColumn("Local", typeof(float)),
+					new DataColumn("Rta", typeof(float)),
+					new DataColumn("Rate", typeof(float)),
+					new DataColumn("EffectiveDate", typeof(DateTime)),
+					new DataColumn("ExpirationDate", typeof(DateTime))
+				});
+				// Rename the LOCCODE column.
+				b.DataRow.Table.Columns["LOCCODE"].ColumnName = "LocationCode";
+				b.DataRow.SetField("Name", taxRateInfo.Name);
+				b.DataRow.SetField("State", taxRateInfo.State);
+				b.DataRow.SetField("Local", taxRateInfo.Local);
+				b.DataRow.SetField("Rta", taxRateInfo.Rta);
+				b.DataRow.SetField("Rate", taxRateInfo.Rate);
+				b.DataRow.SetField("EffectiveDate", taxRateInfo.EffectiveDate);
+				b.DataRow.SetField("ExpirationDate", taxRateInfo.ExpirationDate);
+				yield return b;
+			}
 		}
 	}
 }

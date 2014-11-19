@@ -3,6 +3,7 @@ using NetTopologySuite.Features;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using WebApi.OutputCache.V2;
 using Wsdot.Dor.Tax.DataContracts;
@@ -121,7 +122,8 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		public HttpResponseMessage GetCurrentCombinedBoundariesAndRates(int outSR = _defaultSrid)
 		{
 			var qy = QuarterYear.Current;
-			string newUrl = this.Request.RequestUri.ToString().Replace("current", string.Empty).TrimEnd('/') + string.Format("/{0}/{1}/{2}", qy.Year, qy.Quarter, outSR);
+			var re = new Regex(@"current(/\d+)?");
+			string newUrl = re.Replace(this.Request.RequestUri.ToString(), "").TrimEnd('/') + string.Format("/{0}/{1}/{2}", qy.Year, qy.Quarter, outSR);
 			var response = this.Request.CreateResponse(System.Net.HttpStatusCode.Redirect);
 			response.Headers.Location = new Uri(newUrl);
 			return response;

@@ -146,6 +146,9 @@
   <ItemGroup>
     <Content Include="App_Data\XmlDocument.xml" />
     <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Content Include="Demo\Leaflet.css" />
+    <Content Include="Demo\Leaflet.html" />
+    <Content Include="Demo\Leaflet.js" />
     <Content Include="index.html" />
     <Content Include="packages.config" />
     <Content Include="Areas\HelpPage\Views\Web.config" />

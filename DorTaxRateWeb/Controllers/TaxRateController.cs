@@ -1,6 +1,12 @@
-﻿using NetTopologySuite.CoordinateSystems;
+﻿using GeoAPI.CoordinateSystems;
+using GeoAPI.CoordinateSystems.Transformations;
+using GeoAPI.Geometries;
+using NetTopologySuite.CoordinateSystems;
+using NetTopologySuite.CoordinateSystems.Transformations;
 using NetTopologySuite.Features;
 using NetTopologySuite.IO;
+using ProjNet.CoordinateSystems;
+using ProjNet.CoordinateSystems.Transformations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,6 +30,62 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 	{
 		const int _defaultCache = 365*24*60*60*60;
 		const int _defaultSrid = 2927;
+		const int _webMercatorSrid = 3857;
+		const int _wgs84Srid = 4326;
+
+		#region Coordinate System WKT
+		const string wkt2927 = @"PROJCS[""NAD83(HARN) / Washington South (ftUS)"",
+    GEOGCS[""NAD83(HARN)"",
+        DATUM[""NAD83_High_Accuracy_Regional_Network"",
+            SPHEROID[""GRS 1980"",6378137,298.257222101,
+                AUTHORITY[""EPSG"",""7019""]],
+            AUTHORITY[""EPSG"",""6152""]],
+        PRIMEM[""Greenwich"",0,
+            AUTHORITY[""EPSG"",""8901""]],
+        UNIT[""degree"",0.01745329251994328,
+            AUTHORITY[""EPSG"",""9122""]],
+        AUTHORITY[""EPSG"",""4152""]],
+    UNIT[""US survey foot"",0.3048006096012192,
+        AUTHORITY[""EPSG"",""9003""]],
+    PROJECTION[""Lambert_Conformal_Conic_2SP""],
+    PARAMETER[""standard_parallel_1"",47.33333333333334],
+    PARAMETER[""standard_parallel_2"",45.83333333333334],
+    PARAMETER[""latitude_of_origin"",45.33333333333334],
+    PARAMETER[""central_meridian"",-120.5],
+    PARAMETER[""false_easting"",1640416.667],
+    PARAMETER[""false_northing"",0],
+    AUTHORITY[""EPSG"",""2927""],
+    AXIS[""X"",EAST],
+    AXIS[""Y"",NORTH]]";
+
+////		const string wktAuxSphere = @"PROJCS[""WGS_1984_Web_Mercator_Auxiliary_Sphere"",
+////    GEOGCS[""GCS_WGS_1984"",
+////        DATUM[""D_WGS_1984"",
+////            SPHEROID[""WGS_1984"",6378137.0,298.257223563]],
+////        PRIMEM[""Greenwich"",0.0],
+////        UNIT[""Degree"",0.017453292519943295]],
+////    PROJECTION[""Mercator_Auxiliary_Sphere""],
+////    PARAMETER[""False_Easting"",0.0],
+////    PARAMETER[""False_Northing"",0.0],
+////    PARAMETER[""Central_Meridian"",0.0],
+////    PARAMETER[""Standard_Parallel_1"",0.0],
+////    PARAMETER[""Auxiliary_Sphere_Type"",0.0],
+////    UNIT[""Meter"",1.0]]";
+
+
+		const string wktWgs84 = @"GEOGCS[""WGS 84"",
+    DATUM[""WGS_1984"",
+        SPHEROID[""WGS 84"",6378137,298.257223563,
+            AUTHORITY[""EPSG"",""7030""]],
+        AUTHORITY[""EPSG"",""6326""]],
+    PRIMEM[""Greenwich"",0,
+        AUTHORITY[""EPSG"",""8901""]],
+    UNIT[""degree"",0.01745329251994328,
+        AUTHORITY[""EPSG"",""9122""]],
+    AUTHORITY[""EPSG"",""4326""]]"; 
+		#endregion
+
+		
 
 		/// <summary>
 		/// Gets the tax rates for a specific quarter-year year.
@@ -66,11 +128,35 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
 		public FeatureCollection GetSalesTaxJursitictionBoundaries(int year, int quarter, int outSR=_defaultSrid)
 		{
-			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter));
+			// TODO: Projected output includes Z coordinates but shouldn't.
+			if (outSR != _defaultSrid && outSR != _wgs84Srid)
+			{
+				throw new ArgumentException(string.Format("Unsupported spatial reference:{0}", outSR), "outSR");
+			}
+			IEnumerable<Feature> boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter));
 			var featureCollection = new FeatureCollection();
-			featureCollection.CRS = new NamedCRS("urn:ogc:def:crs:EPSG::2927");
+
+			// Spatial reference does not need to be specified for WGS 84, as it is assumed for GeoJSON if spatial reference is unspecified.
+			if (outSR != _wgs84Srid)
+			{
+				featureCollection.CRS = new NamedCRS(string.Format("urn:ogc:def:crs:EPSG::{0}", outSR));
+			}
+			ICoordinateTransformation xForm = null;
+			IGeometryFactory gFactory = NetTopologySuite.Geometries.GeometryFactory.Default;
+			if (outSR != _defaultSrid)
+			{
+				var xFormFactory = new CoordinateTransformationFactory();
+				var csFactory = new CoordinateSystemFactory();
+				var inCS = csFactory.CreateFromWkt(wkt2927);
+				var outCS = csFactory.CreateFromWkt(wktWgs84);
+				xForm = xFormFactory.CreateFromCoordinateSystems(inCS, outCS);
+			}
 			foreach (var boundary in boundaries)
 			{
+				if (xForm != null && boundary.Geometry != null)
+				{
+					boundary.Geometry = GeometryTransform.TransformGeometry(gFactory, boundary.Geometry, xForm.MathTransform);
+				}
 				featureCollection.Add(boundary);
 			}
 

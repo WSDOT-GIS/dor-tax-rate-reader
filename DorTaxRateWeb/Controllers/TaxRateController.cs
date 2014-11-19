@@ -75,7 +75,9 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		{
 			ProjectionInfo targetProjection = outSR == _defaultSrid ? null : ProjectionInfo.FromEpsgCode(outSR);
 			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter), targetProjection);
-			var featureCollection = boundaries.ToNtsFeatureCollection(outSR, _omittedFields);
+			var aliases = new Dictionary<string, string>();
+			aliases.Add("LOCCODE", "LocationCode");
+			var featureCollection = boundaries.ToNtsFeatureCollection(outSR, _omittedFields, aliases);
 
 			return featureCollection;
 		}

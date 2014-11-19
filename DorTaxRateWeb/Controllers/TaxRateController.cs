@@ -76,10 +76,12 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 			{
 				featureCollection.CRS = new NamedCRS(string.Format("urn:ogc:def:crs:EPSG::{0}", outSR));
 			}
+			// Get the index of the LOCCODE column.
+			int locCodeColumn = boundaries.First().DataRow.Table.Columns["LOCCODE"].Ordinal;
 			foreach (var boundary in boundaries)
 			{
 				var geometry = boundary.ToShape().ToGeoAPI();
-				var locCode = (string)boundary.DataRow["LOCCODE"];
+				var locCode = (string)boundary.DataRow[locCodeColumn];
 				var attributesTable = new AttributesTable();
 				attributesTable.AddAttribute("LocationCode", locCode);
 				var feature = new Feature(geometry, attributesTable);

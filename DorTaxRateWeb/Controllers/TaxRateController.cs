@@ -34,7 +34,6 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
 		/// <returns>Returns a list of <see cref="TaxRateItem"/> objects.</returns>
 		[Route("rates/{year:min(2008)}/{quarter:range(1,4)}")]
-		[Route("rates/{year:min(2008)}/{quarter:range(1,4)}")]
 		[CacheOutput(ServerTimeSpan=_defaultCache, ClientTimeSpan=_defaultCache)]
 		public IEnumerable<TaxRateItem> GetTaxRates(int year, int quarter)
 		{

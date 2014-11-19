@@ -214,3 +214,6 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 DorTaxRateWeb/App_Data/XmlDocument.xml
+DorTaxRateWeb/Utility/DotSpatialEx.cs
+DorTaxRateWeb/Utility/GeometryConverterToDotSpatial.cs
+DorTaxRateWeb/Utility/GeometryConverterToGeoAPI.cs

@@ -1,4 +1,6 @@
-﻿using NetTopologySuite.CoordinateSystems;
+﻿using DotSpatial.Projections;
+using DotSpatial.Topology;
+using NetTopologySuite.CoordinateSystems;
 using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using System;
@@ -66,12 +68,22 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
 		public FeatureCollection GetSalesTaxJursitictionBoundaries(int year, int quarter, int outSR=_defaultSrid)
 		{
-			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter));
+			ProjectionInfo targetProjection = outSR == _defaultSrid ? null : ProjectionInfo.FromEpsgCode(outSR);
+			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter), targetProjection);
 			var featureCollection = new FeatureCollection();
-			featureCollection.CRS = new NamedCRS("urn:ogc:def:crs:EPSG::2927");
+			// Omit CRS for WGS 84, which is the default for GeoJSON.
+			if (outSR != 4326)
+			{
+				featureCollection.CRS = new NamedCRS(string.Format("urn:ogc:def:crs:EPSG::{0}", outSR));
+			}
 			foreach (var boundary in boundaries)
 			{
-				featureCollection.Add(boundary);
+				var geometry = boundary.ToShape().ToGeoAPI();
+				var locCode = (string)boundary.DataRow["LOCCODE"];
+				var attributesTable = new AttributesTable();
+				attributesTable.AddAttribute("LocationCode", locCode);
+				var feature = new Feature(geometry, attributesTable);
+				featureCollection.Add(feature);
 			}
 
 			return featureCollection;

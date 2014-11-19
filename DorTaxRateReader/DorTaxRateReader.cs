@@ -57,7 +57,7 @@ namespace Wsdot.Dor.Tax
 					}
 				}).Wait();
 
-				foreach (var kvp in EnumerateLocationCodeBoundaries(shp_name))
+				foreach (var kvp in EnumerateLocationCodeBoundaries(shp_name, targetProjection))
 				{
 					yield return kvp;
 				}

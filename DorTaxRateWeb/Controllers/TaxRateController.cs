@@ -5,6 +5,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -26,6 +27,11 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 	{
 		const int _defaultCache = 365*24*60*60*60;
 		const int _defaultSrid = 2927;
+		static readonly string[] _omittedFields = new[] {
+			"Shape_Area",
+			"OBJECTID",
+			"Shape_Leng"
+		};
 
 		/// <summary>
 		/// Gets the tax rates for a specific quarter-year year.
@@ -69,30 +75,17 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		{
 			ProjectionInfo targetProjection = outSR == _defaultSrid ? null : ProjectionInfo.FromEpsgCode(outSR);
 			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter), targetProjection);
-			var featureCollection = new FeatureCollection();
-			// Omit CRS for WGS 84, which is the default for GeoJSON.
-			if (outSR != 4326)
-			{
-				featureCollection.CRS = new NamedCRS(string.Format("urn:ogc:def:crs:EPSG::{0}", outSR));
-			}
-			// Get the index of the LOCCODE column.
-			int locCodeColumn = boundaries.First().DataRow.Table.Columns["LOCCODE"].Ordinal;
-			foreach (var boundary in boundaries)
-			{
-				var geometry = boundary.ToShape().ToGeoAPI();
-				var locCode = (string)boundary.DataRow[locCodeColumn];
-				var attributesTable = new AttributesTable();
-				attributesTable.AddAttribute("LocationCode", locCode);
-				var feature = new Feature(geometry, attributesTable);
-				featureCollection.Add(feature);
-			}
+			var featureCollection = boundaries.ToNtsFeatureCollection(outSR, _omittedFields);
 
 			return featureCollection;
 		}
 
+
+
 		/// <summary>
 		/// Gets current juristiction boundaries by redirecting to the current quarter's juristiction boundaries endpoint.
 		/// </summary>
+		/// <param name="outSR">The EPSG identifier for a coordinate system.</param>
 		/// <returns>An <see cref="HttpResponseMessage"/> that redirects to <see cref="GetSalesTaxJursitictionBoundaries(int, int, int)"/>.</returns>
 		[Route("boundaries")]
 		[Route("boundaries/current")]

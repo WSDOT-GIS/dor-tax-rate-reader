@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Web.Http;
 using WebApi.OutputCache.V2;
 using Wsdot.Dor.Tax.DataContracts;
+using Wsdot.GeoConversion;
+
 
 namespace Wsdot.Dor.Tax.Web.Controllers
 {

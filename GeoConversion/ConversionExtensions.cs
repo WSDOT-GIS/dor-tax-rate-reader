@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace Wsdot.Dor.Tax.Web
+namespace Wsdot.GeoConversion
 {
 	/// <summary>
 	/// Provides extension methods.

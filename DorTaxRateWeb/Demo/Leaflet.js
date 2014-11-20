@@ -1,4 +1,5 @@
-﻿/*global L*/
+﻿/*jscs: disable*/
+/*global L*/
 (function (L) {
 	"use strict";
 	var map, taxBoundariesLayer, osmLayer, layersControl, geojsonRequest;
@@ -34,8 +35,8 @@
 		table.appendChild(tbody);
 		var row, cell, val;
 		var percentFields = /((Local)|(Rate)|(State)|(Rta))/i;
-		var dateFields = /Date$/i;
 		var fields = ["Name", "Rate", "LocationCode", "State", "Local", "Rta", "ExpirationDate", "EffectiveDate"];
+		var dataElement;
 		fields.forEach(function (name) {
 			if (props.hasOwnProperty(name)) {
 				row = document.createElement("tr");
@@ -44,12 +45,21 @@
 				row.appendChild(cell);
 				cell = document.createElement("td");
 				val = props[name];
-				if (percentFields.test(name)) {
-					val = [Math.round(val * 1000) / 10, "%"].join("");
-				} else if (dateFields.test(name)) {
-					val = new Date(val).toISOString().replace(/T.+$/, "");
+				if (typeof val === "number") {
+					dataElement = document.createElement("data");
+					dataElement.setAttribute("value", val);
+					if (percentFields.test(name)) {
+						dataElement.textContent = [Math.round(val * 1000) / 10, "%"].join("");
+					}
+					cell.appendChild(dataElement);
+				} else if (val instanceof Date) {
+					dataElement = document.createElement("dataElement");
+					dataElement.setAttribute("datetime", val.toISOString());
+					dataElement.textContent = val.toISOString().replace(/T.+$/, "");
+					cell.appendChild(dataElement);
+				} else {
+					cell.textContent = val;
 				}
-				cell.textContent = val;
 				row.appendChild(cell);
 				tbody.appendChild(row);
 			}
@@ -80,7 +90,13 @@
 	geojsonRequest.setRequestHeader("Accept", "application/vnd.geo+json,application/json,text/json");
 	geojsonRequest.addEventListener("loadend", function () {
 		var geoJson = this.responseText;
-		geoJson = JSON.parse(geoJson);
+		geoJson = JSON.parse(geoJson, function (k, v) {
+			var dateRe = /Date$/;
+			if (dateRe.test(k)) {
+				return new Date(v);
+			}
+			return v;
+		});
 		taxBoundariesLayer = L.geoJson(geoJson, {
 			onEachFeature: function (feature, layer) {
 				layer.bindPopup(createPropertiesTable(feature));

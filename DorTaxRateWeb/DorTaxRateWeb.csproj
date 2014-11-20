@@ -149,6 +149,12 @@
     <Content Include="Demo\Leaflet.css" />
     <Content Include="Demo\Leaflet.html" />
     <Content Include="Demo\Leaflet.js" />
+    <Content Include="Demo\Leaflet.min.css">
+      <DependentUpon>Leaflet.css</DependentUpon>
+    </Content>
+    <Content Include="Demo\Leaflet.min.js">
+      <DependentUpon>Leaflet.js</DependentUpon>
+    </Content>
     <Content Include="index.html" />
     <Content Include="packages.config" />
     <Content Include="Areas\HelpPage\Views\Web.config" />
@@ -171,6 +177,9 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
     <Content Include="Areas\HelpPage\Views\_ViewStart.cshtml" />
+    <Content Include="Demo\Leaflet.min.js.map">
+      <DependentUpon>Leaflet.min.js</DependentUpon>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

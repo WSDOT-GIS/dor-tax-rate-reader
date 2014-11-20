@@ -90,6 +90,8 @@
 	geojsonRequest.setRequestHeader("Accept", "application/vnd.geo+json,application/json,text/json");
 	geojsonRequest.addEventListener("loadend", function () {
 		var geoJson = this.responseText;
+		var progressBar = document.getElementsByTagName("progress")[0];
+		progressBar.parentElement.removeChild(progressBar);
 		geoJson = JSON.parse(geoJson, function (k, v) {
 			var dateRe = /Date$/;
 			if (dateRe.test(k)) {

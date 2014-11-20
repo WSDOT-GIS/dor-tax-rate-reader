@@ -5,3 +5,9 @@
 html, body, #map {
     height: 100%;
 }
+progress {
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: 50%;
+}

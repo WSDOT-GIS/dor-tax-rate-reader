@@ -43,6 +43,10 @@ Used for serializing shapefile content to GeoJSON.
 
 Controls caching of web service responses.
 
+### [Fabrik.Common.WebAPI] ###
+
+Enables HTTP compression of GeoJSON responses.
+
 [DOR website]:http://dor.wa.gov/content/FindTaxesAndRates/Downloads.aspx
 [tax rate data provided by Washington State Department of Revenue]:http://dor.wa.gov/content/FindTaxesAndRates/Downloads.aspx
 
@@ -51,3 +55,4 @@ Controls caching of web service responses.
 [NTS-DotSpatial GeometryConverter]:https://www.nuget.org/packages/NetTopologySuite.DotSpatial.Converter/
 [ASP.NET Web API CacheOutput]:https://github.com/filipw/AspNetWebApi-OutputCache
 [WebAPI]:http://www.asp.net/web-api
+[Fabrik.Common.WebAPI]:http://www.nuget.org/packages/Fabrik.Common.WebAPI/

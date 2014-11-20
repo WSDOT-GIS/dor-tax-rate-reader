@@ -3,6 +3,11 @@ Department of Revenue Tax Rate data importer
 
 This project was created by Washington State Department of Transportation (WSDOT) to read [tax rate data provided by Washington State Department of Revenue].
 
+## Requirements ##
+
+* Visual Studio 2013 Update 4
+* Microsoft .NET Framework 4.5.1 (or higher)
+
 ## Projects ##
 
 ### DorTaxRateReader ###
@@ -23,9 +28,6 @@ This project provides methods for converting between data types used in differen
 
 Uses code provided by the [NTS-DotSpatial GeometryConverter] NuGet package.
 
-## Requirements ##
-
-* Visual Studio 2013 Update 4
 
 ## Resources ##
 
@@ -37,7 +39,7 @@ Used for reading and projecting shapefiles.
 
 Used for serializing shapefile content to GeoJSON.
 
-### ASP.NET Web API CacheOutput ###
+### [ASP.NET Web API CacheOutput] ###
 
 Controls caching of web service responses.
 

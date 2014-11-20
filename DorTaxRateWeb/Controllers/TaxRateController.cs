@@ -58,12 +58,12 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		/// <summary>
 		/// Gets sales tax juristiction boundaries for the given quarter-year.
 		/// </summary>
-		/// <param name="year">A year. Minimum allowed value is 2008.</param>
-		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
+		/// <param name="year">A year. Minimum allowed value is 2011.</param>
+		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2011, only quarters 2 through 4 are available.</param>
 		/// <param name="outSR">The EPSG identifier for a coordinate system.</param>
 		/// <returns>Returns a GeoJSON FeatureCollection.</returns>
-		[Route("boundaries/{year:min(2008)}/{quarter:range(1,4)}")]
-		[Route("boundaries/{year:min(2008)}/{quarter:range(1,4)}/{outSR:int}")]
+		[Route("boundaries/{year:min(2011)}/{quarter:range(1,4)}")]
+		[Route("boundaries/{year:min(2011)}/{quarter:range(1,4)}/{outSR:int}")]
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
 		public FeatureCollection GetSalesTaxJursitictionBoundaries(int year, int quarter, int outSR=_defaultSrid)
 		{
@@ -96,12 +96,12 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 		/// <summary>
 		/// Gets juristiction boundary features that also have tax rate attributes.
 		/// </summary>
-		/// <param name="year">A year. Minimum allowed value is 2008.</param>
-		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2008, only quarters 3 and 4 are available.</param>
+		/// <param name="year">A year. Minimum allowed value is 2011.</param>
+		/// <param name="quarter">An integer representing a quarterYear: a value of 1 through 4. For 2011, only quarters 2 through 4 are available.</param>
 		/// <param name="outSR">The EPSG identifier for a coordinate system.</param>
 		/// <returns>Returns a GeoJSON FeatureCollection.</returns>
-		[Route("boundaries/rates/{year:min(2008)}/{quarter:range(1,4)}")]
-		[Route("boundaries/rates/{year:min(2008)}/{quarter:range(1,4)}/{outSR:int}")]
+		[Route("boundaries/rates/{year:min(2011)}/{quarter:range(1,4)}")]
+		[Route("boundaries/rates/{year:min(2011)}/{quarter:range(1,4)}/{outSR:int}")]
 		[CacheOutput(ServerTimeSpan = _defaultCache, ClientTimeSpan = _defaultCache)]
 		public FeatureCollection GetCombinedBoundariesAndRates(int year, int quarter, int outSR = _defaultSrid)
 		{

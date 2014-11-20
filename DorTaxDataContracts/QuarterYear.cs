@@ -156,8 +156,10 @@ namespace Wsdot.Dor.Tax.DataContracts
 		/// <returns>Returns true if valid, false if not.</returns>
 		public bool IsValid
 		{
-			get { 
-				return (this.Year == 2008 && this.Quarter >= 4 && this.Quarter <= 4) || (this.Year > 2008 && this.Quarter >= 1 && this.Quarter <= 4); 
+			get {
+				return Quarter <= 4 && ((Year > 2011 && Quarter >= 1) 
+					|| (Year > 2008 && Quarter >= 3) 
+					|| (Year == 2008 && Quarter >= 2));
 			}
 		}
 

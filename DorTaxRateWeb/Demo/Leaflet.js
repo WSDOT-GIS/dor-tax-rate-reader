@@ -1,7 +1,15 @@
 ﻿/*global L*/
 (function (L) {
 	"use strict";
-	var map, taxBoundariesLayer;
+	var map, taxBoundariesLayer, osmLayer, layersControl, geojsonRequest;
+
+	function QuarterYear(date) {
+		if (!date) {
+			date = new Date(Date.now());
+		}
+		this.year = date.getFullYear();
+		this.quarter = Math.ceil((date.getMonth() + 1) / 3);
+	}
 
 	function createPropertiesTable(feature) {
 		var props = feature.properties;
@@ -35,13 +43,18 @@
 
 	map = L.map('map').setView([47.41322033015946, -120.80566406246835], 7);
 
-	L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	osmLayer = L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		attribution: 'Map data &copy; <a href="//openstreetmap.org">OpenStreetMap</a> contributors, <a href="//creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 		maxZoom: 18
 	}).addTo(map);
 
-	var geojsonRequest = new XMLHttpRequest();
-	geojsonRequest.open("GET", "../tax/boundaries/rates/current/4326");
+	layersControl = L.control.layers({ "OpenStreetMap": osmLayer }).addTo(map);
+
+	L.control.scale().addTo(map);
+
+	geojsonRequest = new XMLHttpRequest();
+	var quarterYear = new QuarterYear();
+	geojsonRequest.open("GET", ["../tax/boundaries/rates", quarterYear.year, quarterYear.quarter, "4326"].join("/"));
 	geojsonRequest.setRequestHeader("Accept", "application/vnd.geo+json,application/json,text/json");
 	geojsonRequest.addEventListener("loadend", function () {
 		var geoJson = this.responseText;
@@ -51,6 +64,7 @@
 				layer.bindPopup(createPropertiesTable(feature));
 			}
 		}).addTo(map);
+		layersControl.addOverlay(taxBoundariesLayer, "Sales Tax Boundaries");
 	});
 	geojsonRequest.send();
 }(L));

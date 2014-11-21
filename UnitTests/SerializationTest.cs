@@ -15,7 +15,7 @@ namespace UnitTests
 		[TestMethod]
 		public void TestGeoJsonSerialization()
 		{
-			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(QuarterYear.Current);
+			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(QuarterYear.Current, null);
 			var featureCollection = new FeatureCollection();
 			featureCollection.CRS = new NetTopologySuite.CoordinateSystems.NamedCRS("urn:ogc:def:crs:EPSG::2927");
 			foreach (var boundary in boundaries)

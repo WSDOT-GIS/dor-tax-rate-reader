@@ -133,7 +133,7 @@ namespace Wsdot.Dor.Tax.Web.Controllers
 			{
 				throw new ArgumentException(string.Format("Unsupported spatial reference:{0}", outSR), "outSR");
 			}
-			IEnumerable<Feature> boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter));
+			IEnumerable<Feature> boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(new QuarterYear(year, quarter), outSR);
 			var featureCollection = new FeatureCollection();
 
 			// Spatial reference does not need to be specified for WGS 84, as it is assumed for GeoJSON if spatial reference is unspecified.

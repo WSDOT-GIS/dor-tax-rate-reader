@@ -38,14 +38,13 @@ namespace UnitTests
 		[TestMethod]
 		public void GetLocationCodeBoundaries()
 		{
-			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(QuarterYear.Current).ToArray();
+			var boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(QuarterYear.Current, null);
 
 			Assert.IsNotNull(boundaries);
-			CollectionAssert.AllItemsAreNotNull(boundaries);
-			CollectionAssert.AllItemsAreInstancesOfType(boundaries, typeof(Feature));
 
 			foreach (var feature in boundaries)
 			{
+				Assert.IsNotNull(feature);
 				if (feature.Geometry == null)
 				{
 					Assert.Fail("All features should have geometry.");
@@ -67,18 +66,8 @@ namespace UnitTests
 				}
 			}
 
-			////// Create the output JSON filename.
-			////string jsonFN = System.IO.Path.Combine(TestContext.DeploymentDirectory, "boundaries.json");
-
-			////// Serialize the results to JSON.
-			////var serializer = JsonSerializer.Create(new JsonSerializerSettings { Formatting = Formatting.Indented });
-			////using (var streamWriter = new StreamWriter(jsonFN))
-			////{
-			////	serializer.Serialize(streamWriter, boundaries);
-			////}
-			////TestContext.AddResultFile(jsonFN);
-
-
+			boundaries = DorTaxRateReader.EnumerateLocationCodeBoundaries(QuarterYear.Current, 3857);
+			boundaries.First();
 		}
 	}
 }

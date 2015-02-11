@@ -1,6 +1,8 @@
 Department of Revenue Tax Rate data importer
 ============================================
 
+[![bitHound Score](https://www.bithound.io/WSDOT-GIS/dor-tax-rate-reader/badges/score.svg?)](https://www.bithound.io/WSDOT-GIS/dor-tax-rate-reader)
+
 This project was created by Washington State Department of Transportation (WSDOT) to read [tax rate data provided by Washington State Department of Revenue].
 
 ## Requirements ##

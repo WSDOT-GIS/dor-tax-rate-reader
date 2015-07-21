@@ -15,8 +15,15 @@ namespace Wsdot.Dor.Tax
 		private Dictionary<int, string> _wktDict = new Dictionary<int, string>();
 		private Dictionary<int, string> _xmlDict = new Dictionary<int, string>();
 
+		private Dictionary<int, int> _exceptions = new Dictionary<int, int>();
+
+		/// <summary>
+		/// Creates a new instance of this class.
+		/// </summary>
 		public EpsgRetriever()
 		{
+			// Reroute requests for 3857 to 102113.
+			_exceptions.Add(3857, 102113);
 			////// epsg.io
 			////// Missing projection parameter 'lattitude_of_origin'
 			////// It is also not defined as 'lattitude_of_center'.
@@ -46,6 +53,11 @@ namespace Wsdot.Dor.Tax
 
 		}
 
+		/// <summary>
+		/// Gets the Well-Known Identifier (WKID) for associated with the ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		public async Task<string> GetWkt(int id)
 		{
 			if (!_wktDict.ContainsKey(id))

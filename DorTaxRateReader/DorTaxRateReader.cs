@@ -204,7 +204,7 @@ namespace Wsdot.Dor.Tax
 		/// <returns></returns>
 		private static TaxRateItem ToTaxRateItem(string line)
 		{
-			var parts = line.Split(new char[] { ',' }, StringSplitOptions.None);
+			var parts = line.Split(new char[] { ',', '\t' }, StringSplitOptions.None);
 			var taxRateItem = new TaxRateItem
 			{
 				Name = parts[0],

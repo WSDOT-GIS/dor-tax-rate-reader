@@ -1,5 +1,4 @@
 ﻿#pragma warning disable 1591
-using Wsdot.Dor.Tax.Web.Areas.HelpPage;
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
